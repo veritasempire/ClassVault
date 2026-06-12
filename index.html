@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Management Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── NAVBAR ─────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="nav-icon">🎓</span>
+      <span class="nav-title">EduTrack</span>
+    </div>
+    <div class="nav-stats">
+      <div class="stat-chip">
+        <span class="stat-label">Students</span>
+        <span class="stat-value mono" id="totalCount">0</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-label">Classes</span>
+        <span class="stat-value mono" id="classCount">0</span>
+      </div>
+    </div>
+    <button class="dark-toggle" id="darkToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <span class="toggle-icon">🌙</span>
+    </button>
+  </nav>
+
+  <!-- ── LAYOUT ─────────────────────────────────────────────── -->
+  <div class="layout">
+
+    <!-- SIDEBAR / FORM PANEL -->
+    <aside class="sidebar">
+      <div class="panel">
+        <h3 class="panel-heading" id="formHeading">Add Student</h3>
+
+        <div class="field-group">
+          <label class="field-label" for="inputName">Full Name</label>
+          <input class="field-input" id="inputName" type="text" placeholder="e.g. Anu Sharma" autocomplete="off" />
+          <span class="field-error" id="errName"></span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="inputClass">Class</label>
+          <input class="field-input" id="inputClass" type="text" placeholder="e.g. 4A or Grade 7" autocomplete="off" />
+          <span class="field-error" id="errClass"></span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="inputTime">Timing</label>
+          <input class="field-input" id="inputTime" type="text" placeholder="e.g. 3:00 PM – 5:00 PM" autocomplete="off" />
+          <span class="field-error" id="errTime"></span>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" id="submitBtn">
+            <span id="submitIcon">＋</span>
+            <span id="submitLabel">Add Student</span>
+          </button>
+          <button class="btn btn-ghost" id="cancelBtn" style="display:none">Cancel</button>
+        </div>
+      </div>
+
+      <!-- QUICK STATS -->
+      <div class="panel panel-stats" id="classBreakdown">
+        <h3 class="panel-heading">Class Breakdown</h3>
+        <div id="breakdownList" class="breakdown-list">
+          <p class="empty-mini">No students yet.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <!-- SEARCH & FILTER BAR -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" id="searchInput" type="text" placeholder="Search by name…" autocomplete="off" />
+        </div>
+        <div class="filter-wrap">
+          <select class="filter-select" id="filterClass">
+            <option value="">All Classes</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- RESULTS HEADER -->
+      <div class="results-header">
+        <span class="results-label" id="resultsLabel">All Students</span>
+        <div class="sort-group">
+          <span class="sort-label">Sort:</span>
+          <button class="sort-btn active" data-sort="createdAt">Recent</button>
+          <button class="sort-btn" data-sort="name">Name A–Z</button>
+          <button class="sort-btn" data-sort="class">Class</button>
+        </div>
+      </div>
+
+      <!-- CARD GRID -->
+      <div class="card-grid" id="cardGrid"></div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">📋</div>
+        <h3 class="empty-title">No students here yet</h3>
+        <p class="empty-sub">Fill in the form on the left to add your first student.</p>
+      </div>
+
+      <!-- NO RESULTS STATE -->
+      <div class="empty-state" id="noResultsState" style="display:none">
+        <div class="empty-icon">🔎</div>
+        <h3 class="empty-title">No matches found</h3>
+        <p class="empty-sub">Try a different name or change the class filter.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── EDIT MODAL ──────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="modalBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Edit Student</h3>
+        <button class="modal-close" id="modalClose" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <label class="field-label" for="editName">Full Name</label>
+          <input class="field-input" id="editName" type="text" />
+          <span class="field-error" id="editErrName"></span>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="editClass">Class</label>
+          <input class="field-input" id="editClass" type="text" />
+          <span class="field-error" id="editErrClass"></span>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="editTime">Timing</label>
+          <input class="field-input" id="editTime" type="text" />
+          <span class="field-error" id="editErrTime"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="modalCancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="modalSaveBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
